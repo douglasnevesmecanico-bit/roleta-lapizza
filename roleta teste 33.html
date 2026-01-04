@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Roleta Premiada - La Pizza Delivery</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: ##D20A2E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.container {
+  background: #111;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  color: #fff;
+  width: 340px;
+  box-shadow: 0 0 20px rgba(255,200,0,0.2);
+}
+
+.logo {
+  width: 180px;
+  margin-bottom: 10px;
+}
+
+canvas {
+  background: #fff;
+  border-radius: 50%;
+  margin-top: 10px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 14px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 30px;
+  background: #f4c430; /* amarelo da logo */
+  color: ##D20A2E;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ffd84d;
+}
+
+button:disabled {
+  background: gray;
+  color: #fff;
+}
+
+.regra {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 10px;
+}
+
+.timer {
+  margin-top: 8px;
+  font-size: 15px;
+  color: #f4c430;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- LOGO -->
+  <img src="logo.png" class="logo" alt="La Pizza Delivery">
+
+  <canvas id="roleta" width="300" height="300"></canvas>
+
+  <button id="girar">GIRAR ROLETA</button>
+
+  <p id="resultado"></p>
+  <p id="timer" class="timer"></p>
+
+  <p class="regra">
+    ✔ Compra mínima R$70<br>
+    ✔ Válido somente neste pedido<br>
+    ✔ Uso único por cliente
+  </p>
+
+</div>
+
+<script>
+const premios = [
+  "Cupom R$10 💸",
+  "Entrega Grátis 🚴",
+  "Cupom R$10 💸",
+  "Coca 1,5l Grátis 🥤",
+  "Cupom R$5 🧀",
+  "Não foi dessa vez 😅"
+];
+
+const cores = [
+  "#f4c430", // amarelo
+  "#000000", // preto
+  "#f4c430",
+  "#1a1a1a",
+  "#ffd84d",
+  "#333333"
+];
+
+const numeroWhats = "5521979289177";
+
+const canvas = document.getElementById("roleta");
+const ctx = canvas.getContext("2d");
+const girarBtn = document.getElementById("girar");
+const resultado = document.getElementById("resultado");
+const timerEl = document.getElementById("timer");
+
+let anguloAtual = 0;
+let tempoRestante = 30 * 60;
+
+// trava uso único
+if (localStorage.getItem("roleta_usada")) {
+  girarBtn.disabled = true;
+  resultado.innerHTML = "⚠️ Você já participou da roleta.";
+}
+
+function desenharRoleta() {
+  const fatia = 2 * Math.PI / premios.length;
+  for (let i = 0; i < premios.length; i++) {
+    ctx.beginPath();
+    ctx.fillStyle = cores[i];
+    ctx.moveTo(150,150);
+    ctx.arc(150,150,150,i*fatia,(i+1)*fatia);
+    ctx.fill();
+    ctx.save();
+    ctx.translate(150,150);
+    ctx.rotate(i*fatia + fatia/2);
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 13px Arial";
+    ctx.fillText(premios[i], 40, 5);
+    ctx.restore();
+  }
+}
+
+function iniciarContagem() {
+  const intervalo = setInterval(() => {
+    const min = Math.floor(tempoRestante / 60);
+    const seg = tempoRestante % 60;
+    timerEl.innerHTML = `⏰ Aproveite: ${min}:${seg < 10 ? "0"+seg : seg}`;
+
+    if (tempoRestante <= 0) {
+      clearInterval(intervalo);
+      timerEl.innerHTML = "⛔ Tempo expirado";
+    }
+    tempoRestante--;
+  }, 1000);
+}
+
+desenharRoleta();
+
+girarBtn.onclick = () => {
+  girarBtn.disabled = true;
+  localStorage.setItem("roleta_usada", "true");
+
+  const giro = Math.random() * 360 + 1440;
+  anguloAtual += giro;
+
+  canvas.style.transition = "transform 4s ease-out";
+  canvas.style.transform = `rotate(${anguloAtual}deg)`;
+
+  setTimeout(() => {
+    const fatia = 360 / premios.length;
+    const index = Math.floor(((anguloAtual % 360) / fatia));
+    const premio = premios[premios.length - 1 - index];
+
+    iniciarContagem();
+
+    const textoWhats = encodeURIComponent(
+      `🎉 Ganhei na Roleta Premiada da La Pizza Delivery!\n\nPrêmio: ${premio}\n\n✔ Compra mínima R$70\n✔ Válido somente neste pedido\n⏰ Usar agora`
+    );
+
+    resultado.innerHTML = `
+      🎉 Você ganhou:<br><strong>${premio}</strong><br>
+      <a href="https://wa.me/${numeroWhats}?text=${textoWhats}">
+        <button>📲 Resgatar no WhatsApp</button>
+      </a>
+    `;
+  }, 4000);
+};
+</script>
+
+</body>
+</html>
