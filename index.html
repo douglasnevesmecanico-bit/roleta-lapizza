@@ -2,31 +2,35 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Roleta Premiada - La Pizza Delivery</title>
 
 <style>
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: ##D20A2E;
+  background: #c1121f; /* vermelho pizzaria */
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
+  touch-action: manipulation;
 }
 
 .container {
   background: #111;
-  padding: 20px;
-  border-radius: 20px;
+  padding: 16px;
+  border-radius: 22px;
   text-align: center;
   color: #fff;
-  width: 340px;
-  box-shadow: 0 0 20px rgba(255,200,0,0.2);
+  width: 92vw;
+  max-width: 360px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
 }
 
 .logo {
-  width: 180px;
+  width: 170px;
   margin-bottom: 10px;
 }
 
@@ -34,33 +38,27 @@ canvas {
   background: #fff;
   border-radius: 50%;
   margin-top: 10px;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
 }
 
 button {
-  margin-top: 15px;
-  padding: 14px 24px;
+  margin-top: 14px;
+  padding: 14px 22px;
   font-size: 16px;
   border: none;
   border-radius: 30px;
-  background: #f4c430; /* amarelo da logo */
-  color: ##D20A2E;
+  background: #f4c430;
+  color: #000;
   font-weight: bold;
   cursor: pointer;
-}
-
-button:hover {
-  background: #ffd84d;
+  width: 100%;
 }
 
 button:disabled {
   background: gray;
   color: #fff;
-}
-
-.regra {
-  font-size: 12px;
-  opacity: 0.9;
-  margin-top: 10px;
 }
 
 .timer {
@@ -69,16 +67,22 @@ button:disabled {
   color: #f4c430;
   font-weight: bold;
 }
+
+.regra {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 10px;
+}
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
-  <!-- LOGO -->
   <img src="logo.png" class="logo" alt="La Pizza Delivery">
 
-  <canvas id="roleta" width="300" height="300"></canvas>
+  <canvas id="roleta" width="280" height="280"></canvas>
 
   <button id="girar">GIRAR ROLETA</button>
 
@@ -98,17 +102,17 @@ const premios = [
   "Cupom R$10 💸",
   "Entrega Grátis 🚴",
   "Cupom R$10 💸",
-  "Coca 1,5l Grátis 🥤",
-  "Cupom R$5 🧀",
+  "Refrigerante Grátis 🥤",
+  "Borda Recheada 🧀",
   "Não foi dessa vez 😅"
 ];
 
 const cores = [
-  "#f4c430", // amarelo
-  "#000000", // preto
   "#f4c430",
-  "#1a1a1a",
+  "#000000",
   "#ffd84d",
+  "#1a1a1a",
+  "#f4c430",
   "#333333"
 ];
 
@@ -134,11 +138,12 @@ function desenharRoleta() {
   for (let i = 0; i < premios.length; i++) {
     ctx.beginPath();
     ctx.fillStyle = cores[i];
-    ctx.moveTo(150,150);
-    ctx.arc(150,150,150,i*fatia,(i+1)*fatia);
+    ctx.moveTo(140,140);
+    ctx.arc(140,140,140,i*fatia,(i+1)*fatia);
     ctx.fill();
+
     ctx.save();
-    ctx.translate(150,150);
+    ctx.translate(140,140);
     ctx.rotate(i*fatia + fatia/2);
     ctx.fillStyle = "#fff";
     ctx.font = "bold 13px Arial";
